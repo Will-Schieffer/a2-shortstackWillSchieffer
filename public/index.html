@@ -10,9 +10,12 @@
     <link rel='icon' href='data:;base64,iVBORw0KGgo=' />
   </head>
   <body>
-    <form>
-      <input type='text' id='yourname' value='your name here'>
-      <button>submit</button>
+    <form id="recipeForm">
+      <input id="title" placeholder="Recipe name" required>
+      <input id="url" placeholder="Recipe URL" required>
+      <button type="submit">Save</button>
     </form>
+
+    <ul id="recipeList"></ul>
   </body>
 </html>

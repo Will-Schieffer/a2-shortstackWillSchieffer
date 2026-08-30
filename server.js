@@ -7,6 +7,9 @@ const http = require( 'http' ),
       dir  = 'public/',
       port = 3000
 
+const recipes = []
+
+/* ignoring this */
 const appdata = [
   { 'model': 'toyota', 'year': 1999, 'mpg': 23 },
   { 'model': 'honda', 'year': 2004, 'mpg': 30 },
@@ -14,9 +17,9 @@ const appdata = [
 ]
 
 const server = http.createServer( function( request,response ) {
-  if( request.method === 'GET' ) {
+  if( request.method === 'GET') {
     handleGet( request, response )    
-  }else if( request.method === 'POST' ){
+  }else if( request.method === 'POST' && request.url == '/submit' ) {
     handlePost( request, response ) 
   }
 })
@@ -39,13 +42,13 @@ const handlePost = function( request, response ) {
   })
 
   request.on( 'end', function() {
-    console.log( JSON.parse( dataString ) )
-    // ... do something with the data here!!!
+    const recipe = JSON.parse( dataString )
+    recipes.push( recipe )
 
-    response.writeHead( 200, "OK", {'Content-Type': 'text/plain' })
+    response.writeHead( 200, "OK", {'Content-Type': 'application/json' })
 
-    // change this to incorporate data
-    response.end('test')
+    // change this to incorporate data - ok
+    response.end(JSON.stringify(recipes))
   })
 }
 
