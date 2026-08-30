@@ -16,11 +16,15 @@ const appdata = [
   { 'model': 'ford', 'year': 1987, 'mpg': 14} 
 ]
 
+
+// I don't love this way of handling routes but it works for my purposes I guess
 const server = http.createServer( function( request,response ) {
   if( request.method === 'GET') {
     handleGet( request, response )    
   }else if( request.method === 'POST' && request.url == '/submit' ) {
     handlePost( request, response ) 
+  }else if (request.method === 'POST' && request.url == '/delete') {
+    handleDelete( request, response )
   }
 })
 
@@ -43,6 +47,11 @@ const handlePost = function( request, response ) {
 
   request.on( 'end', function() {
     const recipe = JSON.parse( dataString )
+
+    const url = new URL( recipe.url )
+    recipe.domain = url.hostname.replace(/^www\./, '')
+    recipe.id = Date.now() // This is a little scuffed but it should work
+
     recipes.push( recipe )
 
     response.writeHead( 200, "OK", {'Content-Type': 'application/json' })
@@ -72,6 +81,30 @@ const sendFile = function( response, filename ) {
 
      }
    })
+}
+
+const handleDelete = function( request, response ) {
+  let dataString = ''
+
+  request.on( 'data', function( data ) {
+    dataString += data
+  })
+
+  request.on( 'end', function() {
+    const payload = JSON.parse( dataString )
+    const id = payload.id
+
+    const index = recipes.findIndex(function (recipe) {
+      return recipe.id === id
+    })
+
+    if (index >= 0) {
+      recipes.splice(index, 1)
+    }
+
+    response.writeHead(200, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify(recipes))
+  })
 }
 
 server.listen( process.env.PORT || port )

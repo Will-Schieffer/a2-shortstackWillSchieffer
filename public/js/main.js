@@ -11,10 +11,12 @@ const submit = async function( event ) {
 
   const titleInput = document.querySelector( '#title' )
   const urlInput = document.querySelector( '#url' )
+  const categoryInput = document.querySelector( '#category' )
 
   const recipe = {
     title: titleInput.value,
-    url: urlInput.value
+    url: urlInput.value,
+    category: categoryInput.value
   }
 
   const response = await fetch( '/submit', {
@@ -41,9 +43,36 @@ const renderRecipes = function( recipes ) {
     a.target = '_blank'
     a.textContent = recipe.title
 
+    const category = document.createElement( 'span' )
+    category.textContent = ' / ' + recipe.category
+
+    const info = document.createElement( 'small' )
+    info.textContent = ' - ' + recipe.domain
+
+    const deleteButton = document.createElement( 'button' )
+    deleteButton.textContent = "        " + 'Delete'
+    deleteButton.style.color = 'red'
+    deleteButton.onclick = async function() {
+      deleteRecipe( recipe.id )
+    }
+
     li.appendChild( a )
+    li.appendChild( category )
+    li.appendChild( info )
+    li.appendChild( deleteButton )
     list.appendChild( li )
   })
+}
+
+const deleteRecipe = async function( id ) {
+  const response = await fetch( '/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify( { id } )
+  })
+
+  const recipes = await response.json()
+  renderRecipes( recipes )
 }
 
 window.onload = function() {
