@@ -25,6 +25,8 @@ const server = http.createServer( function( request,response ) {
     handlePost( request, response ) 
   }else if (request.method === 'POST' && request.url == '/delete') {
     handleDelete( request, response )
+  }else if (request.method === 'POST' && request.url == '/update') {
+    handleUpdate( request, response )
   }
 })
 
@@ -100,6 +102,31 @@ const handleDelete = function( request, response ) {
 
     if (index >= 0) {
       recipes.splice(index, 1)
+    }
+
+    response.writeHead(200, { 'Content-Type': 'application/json' })
+    response.end(JSON.stringify(recipes))
+  })
+}
+
+const handleUpdate = function( request, response ) {
+  let dataString = ''
+
+  request.on( 'data', function( data ) {
+    dataString += data
+  })
+
+  request.on( 'end', function() {
+    const incoming = JSON.parse(dataString)
+    
+    const index = recipes.findIndex(function (recipe) {
+      return recipe.id === incoming.id
+    })
+
+    if (index >= 0) {
+      recipes[index] = incoming
+    } else {
+      recipes.push(incoming)
     }
 
     response.writeHead(200, { 'Content-Type': 'application/json' })

@@ -1,6 +1,9 @@
 // FRONT-END (CLIENT) JAVASCRIPT HERE
 const form = document.querySelector( '#recipeForm' )
 const list = document.querySelector( '#recipeList' )
+const submitButton = document.querySelector( '#submit' )
+
+let editingID = null
 
 const submit = async function( event ) {
   // stop form submission from trying to load
@@ -19,13 +22,30 @@ const submit = async function( event ) {
     category: categoryInput.value
   }
 
-  const response = await fetch( '/submit', {
-    method:'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify( recipe )
-  })
+  let response
+
+  if (editingID !== null) {
+    recipe.id = editingID
+
+    response = await fetch( '/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( recipe )
+    })
+
+  } else {
+    response = await fetch( '/submit', {
+      method:'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( recipe )
+    })
+  }
 
   const recipes = await response.json()
+
+  editingID = null
+  submitButton.textContent = 'Save'
+  form.reset()
 
   renderRecipes( recipes )
 }
@@ -56,10 +76,18 @@ const renderRecipes = function( recipes ) {
       deleteRecipe( recipe.id )
     }
 
+    const editButton = document.createElement( 'button' )
+    editButton.textContent = "        " + 'Edit'
+    editButton.style.color = 'blue'
+    editButton.onclick = async function() {
+      editRecipe( recipe )
+    }
+
     li.appendChild( a )
     li.appendChild( category )
     li.appendChild( info )
     li.appendChild( deleteButton )
+    li.appendChild( editButton )
     list.appendChild( li )
   })
 }
@@ -76,6 +104,15 @@ const deleteRecipe = async function( id ) {
 }
 
 window.onload = function() {
-  const button = document.querySelector('button')
-  button.onclick = submit
+  submitButton.onclick = submit
+}
+
+const editRecipe = function( recipe ) {
+  document.querySelector( '#title' ).value = recipe.title
+  document.querySelector( '#url' ).value = recipe.url
+  document.querySelector( '#category' ).value = recipe.category
+
+  submitButton.textContent = 'Update Recipe'
+
+  editingID = recipe.id
 }
