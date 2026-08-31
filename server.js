@@ -19,7 +19,9 @@ const appdata = [
 
 // I don't love this way of handling routes but it works for my purposes I guess
 const server = http.createServer( function( request,response ) {
-  if( request.method === 'GET') {
+  if( request.method === 'GET' && request.url === '/recipes' ) {
+    sendRecipes( response )
+  }else if( request.method === 'GET') {
     handleGet( request, response )    
   }else if( request.method === 'POST' && request.url == '/submit' ) {
     handlePost( request, response ) 
@@ -132,6 +134,11 @@ const handleUpdate = function( request, response ) {
     response.writeHead(200, { 'Content-Type': 'application/json' })
     response.end(JSON.stringify(recipes))
   })
+}
+
+const sendRecipes = function( response ) {
+  response.writeHead( 200, "OK", {'Content-Type': 'application/json' })
+  response.end(JSON.stringify(recipes))
 }
 
 server.listen( process.env.PORT || port )

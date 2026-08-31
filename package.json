@@ -1,8 +1,8 @@
 {
-  "name": "",
-  "version": "",
-  "description": "",
-  "author": "",
+  "name": "Will Schieffer's Recipe Pinner",
+  "version": "1.0.0",
+  "description": "A simple recipe pinner app",
+  "author": "Will Schieffer",
   "scripts": {
     "start": "node server.js"
   },

@@ -64,20 +64,20 @@ const renderRecipes = function( recipes ) {
     a.textContent = recipe.title
 
     const category = document.createElement( 'span' )
-    category.textContent = ' / ' + recipe.category
+    category.textContent = recipe.category
 
     const info = document.createElement( 'small' )
-    info.textContent = ' - ' + recipe.domain
+    info.textContent = recipe.domain
 
     const deleteButton = document.createElement( 'button' )
-    deleteButton.textContent = "        " + 'Delete'
+    deleteButton.textContent = 'Delete'
     deleteButton.style.color = 'red'
     deleteButton.onclick = async function() {
       deleteRecipe( recipe.id )
     }
 
     const editButton = document.createElement( 'button' )
-    editButton.textContent = "        " + 'Edit'
+    editButton.textContent = 'Edit'
     editButton.style.color = 'blue'
     editButton.onclick = async function() {
       editRecipe( recipe )
@@ -103,8 +103,15 @@ const deleteRecipe = async function( id ) {
   renderRecipes( recipes )
 }
 
-window.onload = function() {
+const loadRecipes = async function() {
+  const response = await fetch( '/recipes' )
+  const recipes = await response.json()
+  renderRecipes( recipes )
+}
+
+window.onload = async function() {
   submitButton.onclick = submit
+  await loadRecipes()
 }
 
 const editRecipe = function( recipe ) {
