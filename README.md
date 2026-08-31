@@ -2,7 +2,7 @@ Will Schieffer A2 WebWare
 
 Render Deploy: https://a2-shortstackwillschieffer.onrender.com/
 
-## Your Web Application Title
+## Will Schieffer's Recipe Pinner
 This is my attempt at a recipe pinner, a website where you could theoretically
 save a variety of online recipes from other pages. 
 
