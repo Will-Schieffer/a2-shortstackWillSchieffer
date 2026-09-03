@@ -41,6 +41,13 @@ const submit = async function( event ) {
     })
   }
 
+  /* Helps to handle failed fetch requests */
+  if (!response.ok) {
+    const error = await response.json()
+    alert(error.error || 'Something went wrong.')
+    return
+  }
+
   const recipes = await response.json()
 
   editingID = null
@@ -110,7 +117,8 @@ const loadRecipes = async function() {
 }
 
 window.onload = async function() {
-  submitButton.onclick = submit
+  form.addEventListener('submit', submit)
+
   await loadRecipes()
 }
 

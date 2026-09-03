@@ -29,6 +29,9 @@ const server = http.createServer( function( request,response ) {
     handleDelete( request, response )
   }else if (request.method === 'POST' && request.url == '/update') {
     handleUpdate( request, response )
+  }else {
+    response.writeHead(404, { 'Content-Type': 'text/plain' })
+    response.end('404 Error: Not Found')
   }
 })
 
@@ -46,13 +49,41 @@ const handlePost = function( request, response ) {
   let dataString = ''
 
   request.on( 'data', function( data ) {
-      dataString += data 
+    dataString += data
   })
 
   request.on( 'end', function() {
-    const recipe = JSON.parse( dataString )
 
-    const url = new URL( recipe.url )
+    let recipe
+
+    try {
+      recipe = JSON.parse(dataString)
+    } catch (err) {
+      response.writeHead(400, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify({ error: 'Invalid JSON' }))
+      return
+    }
+
+    let url
+
+    /* Validate URL after testing feedback */
+    try {
+      url = new URL(recipe.url)
+
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+        throw new Error('Invalid protocol')
+      }
+
+      if (!url.hostname) {
+        throw new Error('Missing hostname')
+      }
+
+    } catch (err) {
+      response.writeHead(400, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify({ error: 'Invalid URL' }))
+      return
+    }
+
     recipe.domain = url.hostname.replace(/^www\./, '')
     recipe.id = Date.now() // This is a little scuffed but it should work
 
@@ -95,7 +126,17 @@ const handleDelete = function( request, response ) {
   })
 
   request.on( 'end', function() {
-    const payload = JSON.parse( dataString )
+
+    let payload
+
+    try {
+      payload = JSON.parse(dataString)
+    } catch (err) {
+      response.writeHead(400, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify({ error: 'Invalid JSON' }))
+      return
+    }
+
     const id = payload.id
 
     const index = recipes.findIndex(function (recipe) {
@@ -119,7 +160,17 @@ const handleUpdate = function( request, response ) {
   })
 
   request.on( 'end', function() {
-    const incoming = JSON.parse(dataString)
+    
+    
+    let incoming
+
+    try {
+      incoming = JSON.parse(dataString)
+    } catch (err) {
+      response.writeHead(400, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify({ error: 'Invalid JSON' }))
+      return
+    }
     
     const index = recipes.findIndex(function (recipe) {
       return recipe.id === incoming.id
